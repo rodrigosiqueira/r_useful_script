@@ -55,12 +55,11 @@ plot_used_memory <- function(save_to, values_to_plot)
   total_elements <- length(values_to_plot)
   colors <- c('blue', 'green', 'red', 'orange', 'black', 'grey', 'navy')
   set_of_data <- c()
-  xlabel <- 'Time'
-  ylabel <- 'Used (Gb)'
+  xlabel <- 'Time (s)'
+  ylabel <- 'Used Memory (Gb)'
   kb_to_gb <- 1048576
   limit_on_y <- 0
-  last_in_x <- 0
-  first_in_x <- 0
+  limit_on_x <- 0
   index <- 1
 
   # Load data, find max value for X and create label variables
@@ -68,48 +67,53 @@ plot_used_memory <- function(save_to, values_to_plot)
   {
     loaded_file <- load_memory_data(values_to_plot[[line]])
     set_of_data[[line]] <- loaded_file
-
     total_of_elements <- length(loaded_file$Used)
+
+    beginning_at <- min(loaded_file$PosixDate)
+    finished_at <- max(loaded_file$PosixDate)
+    elapsed_time <- abs(finished_at - beginning_at)
+
+    limit_on_y <- max(0, loaded_file$Used / kb_to_gb, limit_on_y)
+
     if (index == 1)
     {
-      first_in_x <- loaded_file$PosixDate[1]
-      last_in_x <- loaded_file$PosixDate[total_of_elements]
-      limit_on_y <- max(0, loaded_file$Used / kb_to_gb)
-      index = 2
+      limit_on_x <- elapsed_time
+      index <- index + 1
       next
     }
-    first_in_x <- min(loaded_file$PosixDate[1], first_in_x)
-    last_in_x <- max(loaded_file$PosixDate[total_of_elements], last_in_x)
-    limit_on_y <- max(loaded_file$Used / kb_to_gb, limit_on_y)
+    limit_on_x <- max(elapsed_time, limit_on_x)
   }
 
   # Setups
   margin <- c(5.1, 5.1, 2, 9.1)
-  png(save_to, width=1024, height=768, res=100)
-  par(mar=margin, xpd=TRUE, xaxs='i')
+  png(save_to, width=1024, height=768)
+  par(mar=margin, xpd=TRUE)
   
   # Note: The last element of memory_data it is date and time in POSIX format.
   first_line <- set_of_data[[1]]
   yrange <- c(0, limit_on_y)
   xrange <- c(0, limit_on_x)
-
-  plot(first_line$PosixDate, first_line$Used / kb_to_gb, type='l',
-       ylim=yrange, col=colors[1], cex.lab=1.5, lty=1, ylab=ylabel,
-       xlab=xlabel, xaxt='n')
-
+  plot(first_line$Used / kb_to_gb, type='l',
+       ylim=yrange, xlim=xrange, col=colors[1], cex.lab=1.5, lty=1, ylab=ylabel,
+       xlab=xlabel, cex.lab=1.5, lwd=2,
+       cex.axis=1.5, cex.main=1.5)
   # First element is ignored because of first plot
   color_index <- 2
   names_line <- tail(names_line, n=length(names_line) - 1)
   for (key in names_line)
   {
     current_data <- set_of_data[[key]]
-    lines(current_data$PosixDate, current_data$Used / kb_to_gb, type='l',
+    lines(current_data$Used / kb_to_gb, type='l',
           col=colors[color_index], lwd=2)
     color_index <- color_index + 1
   }
 
-  display <- seq(first_in_x, last_in_x, length.out=10)
-  axis(1, display, format(display, "%H:%M:%S"))
+  # Legend
+  legend_color <- head(colors, n=total_elements)
+  legend_lty <- rep(1, total_elements)
+  legend_lwd <- rep(2.5, total_elements)
+  legend('topright', inset=c(-0.15,0), legend=names(values_to_plot),
+         lty=legend_lty, lwd=legend_lwd, col=legend_color)
   dev.off()
   return (0)
 }

@@ -27,7 +27,7 @@ plot_mpm_csv_data <- function(graph_name, values_to_plot)
   total_elements <- length(values_to_plot)
   set_of_data <- c()
   colors <- c('blue', 'green', 'red', 'orange', 'black', 'grey', 'navy')
-  xlabel <- 'Average Response Time (ms)'
+  xlabel <- 'Response Time (ms)'
   ylabel <- 'Percentage'
   limit_on_x <- 0
 
@@ -64,7 +64,7 @@ plot_mpm_csv_data <- function(graph_name, values_to_plot)
   }
 
   # Legend
-  legend_color <- tail(colors, n=length(names_line))
+  legend_color <- head(colors, n=total_elements)
   legend_lty <- rep(1, total_elements)
   legend_lwd <- rep(2.5, total_elements)
   legend('topright', inset=c(-0.15,0), legend=names(values_to_plot),
