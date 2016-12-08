@@ -28,8 +28,8 @@ plot_mpm_csv_data <- function(graph_name, values_to_plot)
   total_elements <- length(values_to_plot)
   set_of_data <- c()
   colors <- c('blue', 'green', 'red', 'orange', 'black', 'grey', 'navy')
-  xlabel <- 'Response Time (ms)'
-  ylabel <- 'Percentage'
+  x_label <- 'Response Time (ms)'
+  y_label <- 'Percentage'
   limit_on_x <- 0
 
   # Load data, find max value for X and create label variables
@@ -40,15 +40,14 @@ plot_mpm_csv_data <- function(graph_name, values_to_plot)
     set_of_data[[line]] <- loaded_file
   }
 
-  margin <- c(5.1, 5.1, 2, 9.1)
   png(graph_name, width=1024, height=768)
-  par(mar=margin, xpd=TRUE)
+  layout(rbind(1,2), heights=c(7,1))
 
   # First plot
   first_line <- set_of_data[[1]]
   range_x <- c(0, limit_on_x)
   plot(first_line$Time, first_line$Percentage, type='l', col=colors[1],
-       ylab=ylabel, xlab=xlabel, xlim=range_x, cex.lab=1.5, lwd=2,
+       ylab=y_label, xlab=x_label, xlim=range_x, cex.lab=1.5, lwd=2,
        cex.axis=1.5, cex.main=1.5)
   points(max(first_line$Time), max(first_line$Percentage), pch=3, lwd=2)
 

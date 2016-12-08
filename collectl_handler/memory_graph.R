@@ -48,16 +48,16 @@ load_memory_data <- function(path_origin)
 }
 
 # Plot memory utilization
-# @param save_to
-# @param values_to_plot
+# @param save_to Path to save the generated graphic
+# @param values_to_plot It is a list with name=path_value
 plot_used_memory <- function(save_to, values_to_plot)
 {
   names_line <- names(values_to_plot)
   total_elements <- length(values_to_plot)
   colors <- c('blue', 'green', 'red', 'orange', 'black', 'grey', 'navy')
   set_of_data <- c()
-  xlabel <- 'Time (s)'
-  ylabel <- 'Used Memory (Gb)'
+  x_label <- 'Time (s)'
+  y_label <- 'Used Memory (Gb)'
   kb_to_gb <- 1048576
   limit_on_y <- 0
   limit_on_x <- 0
@@ -75,7 +75,6 @@ plot_used_memory <- function(save_to, values_to_plot)
     elapsed_time <- abs(finished_at - beginning_at)
 
     limit_on_y <- max(0, loaded_file$Used / kb_to_gb, limit_on_y)
-
     if (index == 1)
     {
       limit_on_x <- elapsed_time
@@ -86,17 +85,16 @@ plot_used_memory <- function(save_to, values_to_plot)
   }
 
   # Setups
-  margin <- c(5.1, 5.1, 2, 9.1)
   png(save_to, width=1024, height=768)
-  par(mar=margin, xpd=TRUE)
+  layout(rbind(1,2), heights=c(7,1))
   
   # Note: The last element of memory_data it is date and time in POSIX format.
   first_line <- set_of_data[[1]]
-  yrange <- c(0, limit_on_y)
-  xrange <- c(0, limit_on_x)
+  y_range <- c(0, limit_on_y)
+  x_range <- c(0, limit_on_x)
   plot(first_line$Used / kb_to_gb, type='l',
-       ylim=yrange, xlim=xrange, col=colors[1], cex.lab=1.5, lty=1, ylab=ylabel,
-       xlab=xlabel, cex.lab=1.5, lwd=2,
+       ylim=y_range, xlim=x_range, col=colors[1], cex.lab=1.5, lty=1, ylab=y_label,
+       xlab=x_label, cex.lab=1.5, lwd=2,
        cex.axis=1.5, cex.main=1.5)
   # First element is ignored because of first plot
   color_index <- 2
