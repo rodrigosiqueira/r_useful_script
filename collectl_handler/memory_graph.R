@@ -4,6 +4,7 @@
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3 as
 # published by the Free Software Foundation.
+source(file="util/flexible_parameters.R")
 
 # Convert date string and concatenate it with time to make possible the
 # conversion from string to POSIX date time
@@ -109,52 +110,15 @@ plot_used_memory <- function(save_to, values_to_plot)
   }
 
   # Legend
+  par(mar=c(0, 0, 0, 0))
+  plot.new()
   legend_color <- head(colors, n=total_elements)
   legend_lty <- rep(1, total_elements)
   legend_lwd <- rep(2.5, total_elements)
-  legend('topright', inset=c(-0.15,0), legend=names(values_to_plot),
-         lty=legend_lty, lwd=legend_lwd, col=legend_color)
+  legend('center', 'groups', legend=names(values_to_plot),
+         lty=legend_lty, lwd=legend_lwd, col=legend_color, ncol=total_elements, bty='n')
   dev.off()
   return (0)
 }
 
-#------------------------------------------------------------------------------
-# Handling script execution
-#------------------------------------------------------------------------------
-# Read arguments
-pathsArguments <- commandArgs(trailingOnly=TRUE)
-
-# Verify arguments, before start
-argumentsLength <- length(pathsArguments)
-if (((argumentsLength %% 2) == 0) | (argumentsLength < 3))
-{
-  message <- 'missing file operand'
-  usage <- 'Rscript memory_graph.R SAVE_IMAGE LINE_NAME FILE_TO_PLOT ...'
-  message <- paste(message, usage, sep='\n')
-  stop(message)
-} else
-{
-  index <- 1
-  parameters <- c()
-  for (name in pathsArguments)
-  {
-     # Image path to save
-     if (index == 1)
-     {
-        saveTo <- pathsArguments[index]
-     }
-     # Names are even number
-     else if (index %% 2 == 0)
-     {
-       nameIndex <- pathsArguments[index]
-     }
-     # Values are odd number
-     else
-     {
-      parameters[[nameIndex]] <- pathsArguments[index]
-     }
-     index <- index + 1
-  }
-}
-
-plot_used_memory(saveTo, parameters)
+plot_used_memory(save_to, parameters)
